@@ -10,7 +10,7 @@
 #' @importFrom selectiveInference lar larInf
 #' @importFrom iterators icount
 #' @importFrom parallel detectCores makeCluster clusterCall
-#' @importFrom broom tidy.glmnet glance.glmnet tidy.cv.glmnet glance.cv.glmnet
+#' @importFrom broom tidy glance
 #' @importFrom stats rnorm
 ## usethis namespace: end
 NULL

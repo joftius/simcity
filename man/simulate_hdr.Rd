@@ -2,7 +2,8 @@
 % Please edit documentation in R/sim_hdr.R
 \name{simulate_hdr}
 \alias{simulate_hdr}
-\title{Simulation for high-dimensional linear regression model variable selection}
+\title{simulate_hdr
+Simulation for high-dimensional linear regression model variable selection}
 \usage{
 simulate_hdr(
   niters,
@@ -45,13 +46,13 @@ simulate_hdr(
 List of outputs from \code{postfun} for each of \code{niters} instances.
 }
 \description{
-\code{this} repeats \code{that} multiple times.
+Simulates data from a high-dimensional linear model and then applies user-specified functions to fit a model and process the results.
 }
 \details{
-After generating simulated data this calls \code{something} for inference.
+\enumerate{
+\item Generates a random design matrix and coefficient vector using \code{\link[hdi:rXb]{hdi::rXb()}}.
+\item Generates an outcome variable using \code{yfun}.
+\item Fits a model to the data using the method specified with \code{fitfun}.
+\item Processes the resulting model with \code{postfun}.
 }
-\examples{
-n <- 100
-p <- 200
-s0 <- 5
 }

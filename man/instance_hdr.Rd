@@ -2,7 +2,8 @@
 % Please edit documentation in R/sim_hdr.R
 \name{instance_hdr}
 \alias{instance_hdr}
-\title{Simulation for high-dimensional linear regression model variable selection}
+\title{instance_hdr
+Simulation for high-dimensional linear regression models.}
 \usage{
 instance_hdr(
   n,
@@ -12,11 +13,11 @@ instance_hdr(
   btype = "U[-2,2]",
   permuted = TRUE,
   x.par = switch(xtype, toeplitz = 1/3, equi.corr = 1/20, exp.decay = c(0.4, 5)),
-  yfun,
+  yfun = y_standard_linear,
   yargs = NULL,
-  fitfun,
+  fitfun = fit_glmnet_cvmin,
   fitargs = NULL,
-  postfun,
+  postfun = post_glmnet_cvmin,
   postargs = NULL
 )
 }
@@ -39,13 +40,18 @@ instance_hdr(
 Outputs from \code{postfun} after applying it to the model fitted by \code{fitfun} on one instance of simulated data.
 }
 \description{
-\code{this} repeats \code{that} multiple times.
+Simulates data from a high-dimensional linear model and then applies user-specified functions to fit a model and process the results.
 }
 \details{
-After generating simulated data this calls \code{something} for inference.
+\enumerate{
+\item Generates a random design matrix and coefficient vector using \code{\link[hdi:rXb]{hdi::rXb()}}.
+\item Generates an outcome variable using \code{yfun}.
+\item Fits a model to the data using the method specified with \code{fitfun}.
+\item Processes the resulting model with \code{postfun}.
+}
 }
 \examples{
-n <- 100
-p <- 200
-s0 <- 5
+\dontrun{
+instance_hdr(n = 100, p = 200, s0 = 5)
+}
 }

@@ -5,13 +5,17 @@
 #   Check Package:             'Cmd + Shift + E'
 #   Test Package:              'Cmd + Shift + T'
 
-#' Simulation for high-dimensional linear regression model variable selection
+#' instance_hdr
+#' Simulation for high-dimensional linear regression models.
 #'
 #' @description
-#' `this` repeats `that` multiple times.
+#' Simulates data from a high-dimensional linear model and then applies user-specified functions to fit a model and process the results.
 #'
 #' @details
-#' After generating simulated data this calls `something` for inference.
+#' 1. Generates a random design matrix and coefficient vector using [hdi::rXb()].
+#' 2. Generates an outcome variable using `yfun`.
+#' 3. Fits a model to the data using the method specified with `fitfun`.
+#' 4. Processes the resulting model with `postfun`.
 #'
 #' @param n Sample size, number of rows in design matrix.
 #' @param p Number of random predictor variables or columns in design matrix.
@@ -23,9 +27,9 @@
 #' @return Outputs from `postfun` after applying it to the model fitted by `fitfun` on one instance of simulated data.
 #' @export
 #' @examples
-#' n <- 100
-#' p <- 200
-#' s0 <- 5
+#' \dontrun{
+#' instance_hdr(n = 100, p = 200, s0 = 5)
+#' }
 instance_hdr <- function(
     n,
     p,
@@ -38,11 +42,11 @@ instance_hdr <- function(
                    "equi.corr" = 1/20,
                    "exp.decay" = c(0.4, 5)
     ),
-    yfun,
+    yfun = y_standard_linear,
     yargs = NULL,
-    fitfun,
+    fitfun = fit_glmnet_cvmin,
     fitargs = NULL,
-    postfun,
+    postfun = post_glmnet_cvmin,
     postargs = NULL)
 {
   xtype <- tolower(match.arg(xtype))
@@ -74,23 +78,20 @@ instance_hdr <- function(
   }
 }
 
+#' simulate_hdr
 #' Simulation for high-dimensional linear regression model variable selection
 #'
-#' @description
-#' `this` repeats `that` multiple times.
-#'
-#' @details
-#' After generating simulated data this calls `something` for inference.
+#' @inherit instance_hdr description
+#' @inherit instance_hdr details
 #'
 #' @param niters Number of simulation iterations.
 #' @inheritParams instance_hdr
 #' @param cores Number of cores for parallel computation, passed to \link[parallel]{makeCluster}. Defaults to half of \link[parallel]{detectCores} when not specified.
 #' @return List of outputs from `postfun` for each of `niters` instances.
 #' @export
-#' @examples
-#' n <- 100
-#' p <- 200
-#' s0 <- 5
+#' \dontrun{
+#' simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
+#' }
 simulate_hdr <- function(
     niters,
     n,
@@ -124,23 +125,6 @@ simulate_hdr <- function(
   #clusterCall(cl, function() library(RPtests))
   #clusterCall(cl, function() library(unbiasedgoodness))
   clusterCall(cl, function() source(paste0(getwd(), "/R/sim_hdr.R")))
-
-  # test_run <- instance_hdr(
-  #   n,
-  #   p,
-  #   s0,
-  #   sigma,
-  #   xtype = c("toeplitz", "exp.decay", "equi.corr"),
-  #   btype = "U[-2,2]",
-  #   permuted = TRUE,
-  #   x.par = switch(xtype,
-  #                  "toeplitz"  = 1/3,
-  #                  "equi.corr" = 1/20,
-  #                  "exp.decay" = c(0.4, 5)
-  #   ),
-  #   fitfun,
-  #   fitargs
-  # )
 
   output <- foreach(icount(niters)) %dopar% {
     instance_hdr(
