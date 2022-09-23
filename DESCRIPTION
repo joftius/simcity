@@ -10,3 +10,5 @@ Description: Simplifies generating simulated data for some common statistical
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/joftius/simcity
+BugReports: https://github.com/joftius/simcity/issues
