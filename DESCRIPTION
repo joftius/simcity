@@ -7,8 +7,26 @@ Authors@R:
            comment = c(ORCID = "0000-0002-2905-1632"))
 Description: Simplifies generating simulated data for some common statistical
     tasks in order to test and compare methods.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/joftius/simcity
 BugReports: https://github.com/joftius/simcity/issues
+Imports: 
+    broom,
+    foreach,
+    hdi,
+    iterators,
+    parallel,
+    RPtests,
+    selectiveInference,
+    stats
+Suggests: 
+    ggplot2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    doParallel,
+    glmnet
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
