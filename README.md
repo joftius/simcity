@@ -21,6 +21,12 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(simcity)
-## basic example code
+n <- 100
+p <- 200
+s0 <- 5
+instance_hdr(n, p, s0)
+
+niters <- 100
+simulate_hdr(niters, n, p, s0, cores = 4)
 ```
 
