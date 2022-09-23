@@ -5,8 +5,12 @@
 #   Check Package:             'Cmd + Shift + E'
 #   Test Package:              'Cmd + Shift + T'
 
+# tidy() summarizes information about model components
+# glance() reports information about the entire model
+# augment() adds information about observations to a dataset
+
 #' instance_hdr
-#' Simulation for high-dimensional linear regression models.
+#' Simulate a single instance for high-dimensional linear regression models.
 #'
 #' @description
 #' Simulates data from a high-dimensional linear model and then applies user-specified functions to fit a model and process the results.
@@ -51,7 +55,7 @@ instance_hdr <- function(
 {
   xtype <- tolower(match.arg(xtype))
 
-  sim_data <- rXb(n = n, p = p, s0 = s0, xtype = xtype,
+  sim_data <- hdi::rXb(n = n, p = p, s0 = s0, xtype = xtype,
                   btype = btype, permuted = permuted, x.par = x.par)
   x <- sim_data$x
   beta <- sim_data$beta
@@ -79,7 +83,7 @@ instance_hdr <- function(
 }
 
 #' simulate_hdr
-#' Simulation for high-dimensional linear regression model variable selection
+#' Simulation for high-dimensional linear regression models.
 #'
 #' @inherit instance_hdr description
 #' @inherit instance_hdr details
@@ -87,8 +91,8 @@ instance_hdr <- function(
 #' @param niters Number of simulation iterations.
 #' @inheritParams instance_hdr
 #' @param cores Number of cores for parallel computation, passed to \link[parallel]{makeCluster}. Defaults to half of \link[parallel]{detectCores} when not specified.
+#' @param verbose If `TRUE` will print elapsed time.
 #' @return List of outputs from `postfun` for each of `niters` instances.
-#' @export
 #' \dontrun{
 #' simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
 #' }
@@ -111,7 +115,8 @@ simulate_hdr <- function(
     fitargs = NULL,
     postfun = post_glmnet_cvmin,
     postargs = NULL,
-    cores = NULL
+    cores = NULL,
+    verbose = FALSE
 )
 {
 
@@ -121,18 +126,19 @@ simulate_hdr <- function(
   if (is.null(cores)) cores <- floor(detectCores()/2)
   cl <- makeCluster(cores)
   registerDoParallel(cl)
+  clusterCall(cl, function() library(glmnet))
   #clusterCall(cl, function() library(selectiveInference))
   #clusterCall(cl, function() library(RPtests))
   #clusterCall(cl, function() library(unbiasedgoodness))
-  clusterCall(cl, function() source(paste0(getwd(), "/R/sim_hdr.R")))
+  #clusterCall(cl, function() source(paste0(getwd(), "/R/sim_hdr.R")))
 
   output <- foreach(icount(niters)) %dopar% {
     instance_hdr(
       n,
       p,
       s0,
-      xtype = c("toeplitz", "exp.decay", "equi.corr"),
-      btype = "U[-2,2]",
+      xtype = xtype,
+      btype = btype,
       permuted = TRUE,
       x.par = switch(xtype,
                      "toeplitz"  = 1/3,
@@ -150,7 +156,7 @@ simulate_hdr <- function(
   stopImplicitCluster()
   time_end <- Sys.time()
 
-  print(time_end - time_start)
+  if (verbose) print(time_end - time_start)
   return(output)
 }
 
@@ -190,8 +196,50 @@ post_glmnet_cvmin <- function(fit_obj, x, y, beta, postargs = NULL) {
   lambda_type <- "lambda.1se"
   if (!is.null(postargs)) lambda_type <- postargs$lambda
   lambda_min <- fit_obj$cv_fit[[lambda_type]]
-  list(true_beta = beta,
-       beta_hat = coef.glmnet(fit_obj$glmnet_fit, s = lambda_min))
+  beta_hat <- coef.glmnet(fit_obj$glmnet_fit,
+                          s = lambda_min,
+                          exact = TRUE,
+                          x = x,
+                          y = y)
+  terms <- rownames(beta_hat)
+  output <- data.frame(
+    term = terms,
+    estimate = beta_hat[1:nrow(beta_hat)],
+    true_beta = if (terms[1] == "(Intercept)") c(0, beta) else beta)
+ attributes(output)$lambda <- lambda_min
+ attributes(output)$lambda_type <- lambda_type
+ output
+}
+
+#' simmary_coefs
+#' Compute simulation summary using true and estimated linear model coefficients.
+#'
+#' @description
+#' Compute simulation summary using true and estimated linear model coefficients.
+#'
+#' @details
+#'
+#' @param list_of_instances The output of a simulation function.
+#' @returns
+#' A `data.frame` with one row for each simulation instance and several performance metrics:
+#'
+#' * `screened` Boolean indicating whether the selected model's support is a superset of the true support, i.e. if the selected variables include all the ones with nonzero coefficients in the true simulated model.
+#' * `mse` The mean-square error of estimating the true coefficients.
+#' * `beta_min` The smallest nonzero coefficient in the true model (in absolute value).
+#' @export
+#' \dontrun{
+#' instances <- simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
+#' simmary_coefs(instances)
+#' }
+simmary_coefs <- function(list_of_instances) {
+  list_of_instances |> purrr::map_dfr(
+    function(lfit) {
+      data.frame(
+        screened = all(which(lfit$true_beta != 0) %in% which(lfit$estimate != 0)),
+        mse = mean((lfit$estimate - lfit$true_beta)^2),
+        beta_min = min(abs(lfit$true_beta[which(lfit$true_beta !=0)]))
+        )
+      })
 }
 
 # test run

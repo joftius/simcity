@@ -40,6 +40,12 @@
 <li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/lasso-screening.html">lasso-screening</a>
+  </div>
+</li>
 <li class="nav-item">
   <a class="nav-link" href="news/index.html">Changelog</a>
 </li>
@@ -79,10 +85,25 @@
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
+<p>The first motivating example for this package was simulating high-dimensional linear regression models, fitting them with the lasso, and analyzing various performance metrics.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joftius/simcity" class="external-link">simcity</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
+<span><span class="va">s0</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="va">one_lasso_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instance_hdr.html">instance_hdr</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">p</span>, <span class="va">s0</span><span class="op">)</span></span>
+<span><span class="va">one_lasso_fit</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">one_lasso_fit</span><span class="op">$</span><span class="va">true_beta</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">one_lasso_fit</span><span class="op">$</span><span class="va">estimate</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<p>The above example generates one instance of simulated data, fits a regression model using <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet</a></code> and the <code>lambda.1se</code> option by default. The <code>simcity</code> package streamlines doing processes like this many times, and typically finishes in about half the time (or less) by using parallel processing.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">niters</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
+<span><span class="va">many_lasso_fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_hdr.html">simulate_hdr</a></span><span class="op">(</span><span class="va">niters</span>, <span class="va">n</span>, <span class="va">p</span>, <span class="va">s0</span>, cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">sim_summary</span> <span class="op">&lt;-</span> <span class="fu">simmary_coefs</span><span class="op">(</span><span class="va">many_lasso_fits</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_summary</span><span class="op">)</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">sim_summary</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">screened</span>, <span class="va">beta_min</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_boxplot</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">sim_summary</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">beta_min</span>, <span class="va">mse</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The above example generates a number <code>niters</code> of instances of simulated data, fits each of them using <code>cv.glmnet</code>, and computes some interesting summaries about the overall results.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
