@@ -2,6 +2,7 @@
 # simcity
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/joftius/simcity/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/joftius/simcity/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of simcity is to streamline simulating data to evaluate and compare methods for some common statistical tasks. 
