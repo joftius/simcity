@@ -1,11 +1,12 @@
 Package: simcity
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Parallel Simulations For Common Statistical Tasks
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: 
+    person("Joshua", "Loftus", "R", "joftius@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-2905-1632"))
+Description: Simplifies generating simulated data for some common statistical
+    tasks in order to test and compare methods.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
