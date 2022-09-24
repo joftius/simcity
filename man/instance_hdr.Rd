@@ -3,7 +3,7 @@
 \name{instance_hdr}
 \alias{instance_hdr}
 \title{instance_hdr
-Simulation for high-dimensional linear regression models.}
+Simulate a single instance for high-dimensional linear regression models.}
 \usage{
 instance_hdr(
   n,

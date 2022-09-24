@@ -1,5 +1,5 @@
 ---
-title: "lasso-screening"
+title: "Lasso screening"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 link-citations: TRUE
@@ -31,7 +31,6 @@ In this vignette we show how to use `simcity` to simulate many high-dimensional 
 
 ```{r setup}
 library(simcity)
-devtools::load_all() # why tho
 ```
 
 ### A single simulated dataset
@@ -139,11 +138,10 @@ if (file.exists(sim_results_file)) {
               function(s0) {
                 many_fits <- simulate_hdr(niters, n, p, s0)
                 sim_summary <- simmary_coefs(many_fits)
-                sim_summary$sparsity <- s0
                 sim_summary
               })
   sim_summary <- full_results |>
-    group_by(sparsity) |>
+    group_by(true_sparsity) |>
     summarize(screening = mean(screened),
               avg_bmin = mean(beta_min))
   time_end <- Sys.time()
@@ -154,7 +152,7 @@ if (file.exists(sim_results_file)) {
 
 ```{r sparsity-plot1}
 sim_summary |>
-  ggplot(aes(sparsity, screening)) +
+  ggplot(aes(true_sparsity, screening)) +
   geom_col(aes(fill = avg_bmin)) +
   scale_fill_viridis_c(direction = -1)
 ```
@@ -164,6 +162,7 @@ We can see that the frequency of screening decreases as the true sparsity increa
 To separate these effects, let's run the simulation again but pass an option to generate all nonzero coefficients as a constant `= 1`.
 
 ```{r}
+sparsities <- 9 + 2*0:16
 sim_results_file <- "./data/lasso-screening-sparsity-bfix1.csv"
 # Check whether results already saved
 if (file.exists(sim_results_file)) {
@@ -176,15 +175,18 @@ if (file.exists(sim_results_file)) {
   time_start <- Sys.time()
   full_results <- purrr::map_dfr(sparsities,
               function(s0) {
-                many_fits <- simulate_hdr(niters, n, p, s0,
-                                          btype = "bfix1")
+                many_fits <- 
+                  simulate_hdr(niters, n, p, s0,
+                               btype = "bfix1",
+                               cores = detectCores() - 2)
                 sim_summary <- simmary_coefs(many_fits)
-                sim_summary$sparsity <- s0
                 sim_summary
               })
   sim_bfix_summary <- full_results |>
-    group_by(sparsity) |>
+    group_by(true_sparsity) |>
     summarize(screening = mean(screened),
+              fpr = mean(false_positives/
+                           pmax(1, estimated_sparsity)),
               avg_bmin = mean(beta_min))
   time_end <- Sys.time()
   print(time_end - time_start)
@@ -194,9 +196,22 @@ if (file.exists(sim_results_file)) {
 
 ```{r sparsity-plot2}
 sim_bfix_summary |>
-  ggplot(aes(sparsity, screening)) +
+  ggplot(aes(true_sparsity, screening)) +
   geom_col(aes(fill = avg_bmin)) +
   scale_fill_viridis_c(direction = -1)
+```
+
+Now all the nonzero true coefficients equal 1 and we can see a much higher screening rate with successful screening at higher sparsity levels. 
+
+### Other metrics
+
+Lasso screening is just one example. This package can be used to compare various performance metrics, fitting procedures, and other kinds of simulated data and tasks. As a brief example, we show here one other metric from the above simulated data, the **false positive rate** or proportion of variables selected by lasso which have coefficients of zero in the true model.
+
+```{r sparsity-plot-fpr}
+sim_bfix_summary |>
+  ggplot(aes(true_sparsity, fpr)) +
+  geom_col(aes(fill = screening)) +
+  scale_fill_viridis_c()
 ```
 
 ## References

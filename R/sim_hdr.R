@@ -93,6 +93,8 @@ instance_hdr <- function(
 #' @param cores Number of cores for parallel computation, passed to \link[parallel]{makeCluster}. Defaults to half of \link[parallel]{detectCores} when not specified.
 #' @param verbose If `TRUE` will print elapsed time.
 #' @return List of outputs from `postfun` for each of `niters` instances.
+#' @export
+#' @examples
 #' \dontrun{
 #' simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
 #' }
@@ -227,6 +229,7 @@ post_glmnet_cvmin <- function(fit_obj, x, y, beta, postargs = NULL) {
 #' * `mse` The mean-square error of estimating the true coefficients.
 #' * `beta_min` The smallest nonzero coefficient in the true model (in absolute value).
 #' @export
+#' @examples
 #' \dontrun{
 #' instances <- simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
 #' simmary_coefs(instances)
@@ -234,8 +237,15 @@ post_glmnet_cvmin <- function(fit_obj, x, y, beta, postargs = NULL) {
 simmary_coefs <- function(list_of_instances) {
   list_of_instances |> purrr::map_dfr(
     function(lfit) {
+      true_support <- which(lfit$true_beta != 0)
+      estimated_support <- which(lfit$estimate != 0)
+      recovered <- true_support %in% estimated_support
       data.frame(
-        screened = all(which(lfit$true_beta != 0) %in% which(lfit$estimate != 0)),
+        true_sparsity = length(true_support),
+        estimated_sparsity = length(estimated_support),
+        false_positives = length(setdiff(estimated_support, true_support)),
+        true_positives = sum(recovered),
+        screened = all(recovered),
         mse = mean((lfit$estimate - lfit$true_beta)^2),
         beta_min = min(abs(lfit$true_beta[which(lfit$true_beta !=0)]))
         )

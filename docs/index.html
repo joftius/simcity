@@ -43,7 +43,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/lasso-screening.html">lasso-screening</a>
+    <a class="dropdown-item" href="articles/lasso-screening.html">Lasso screening</a>
   </div>
 </li>
 <li class="nav-item">
@@ -72,7 +72,7 @@
 <div class="page-header"><h1 id="simcity">simcity<a class="anchor" aria-label="anchor" href="#simcity"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
+
 <p>The goal of simcity is to streamline simulating data to evaluate and compare methods for some common statistical tasks.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -99,7 +99,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">niters</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
 <span><span class="va">many_lasso_fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_hdr.html">simulate_hdr</a></span><span class="op">(</span><span class="va">niters</span>, <span class="va">n</span>, <span class="va">p</span>, <span class="va">s0</span>, cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">sim_summary</span> <span class="op">&lt;-</span> <span class="fu">simmary_coefs</span><span class="op">(</span><span class="va">many_lasso_fits</span><span class="op">)</span></span>
+<span><span class="va">sim_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simmary_coefs.html">simmary_coefs</a></span><span class="op">(</span><span class="va">many_lasso_fits</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_summary</span><span class="op">)</span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span><span class="va">sim_summary</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">screened</span>, <span class="va">beta_min</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_boxplot</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span><span class="va">sim_summary</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">beta_min</span>, <span class="va">mse</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -137,7 +137,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/joftius/simcity/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/joftius/simcity/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

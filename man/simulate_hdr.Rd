@@ -3,7 +3,7 @@
 \name{simulate_hdr}
 \alias{simulate_hdr}
 \title{simulate_hdr
-Simulation for high-dimensional linear regression model variable selection}
+Simulation for high-dimensional linear regression models.}
 \usage{
 simulate_hdr(
   niters,
@@ -20,7 +20,8 @@ simulate_hdr(
   fitargs = NULL,
   postfun = post_glmnet_cvmin,
   postargs = NULL,
-  cores = NULL
+  cores = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ simulate_hdr(
 \item{postfun, postargs}{Function and (optional) arguments for post-processing fitted models.}
 
 \item{cores}{Number of cores for parallel computation, passed to \link[parallel]{makeCluster}. Defaults to half of \link[parallel]{detectCores} when not specified.}
+
+\item{verbose}{If \code{TRUE} will print elapsed time.}
 }
 \value{
 List of outputs from \code{postfun} for each of \code{niters} instances.
@@ -54,5 +57,10 @@ Simulates data from a high-dimensional linear model and then applies user-specif
 \item Generates an outcome variable using \code{yfun}.
 \item Fits a model to the data using the method specified with \code{fitfun}.
 \item Processes the resulting model with \code{postfun}.
+}
+}
+\examples{
+\dontrun{
+simulate_hdr(niters = 500, n = 100, p = 200, s0 = 5)
 }
 }
