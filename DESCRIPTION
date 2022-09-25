@@ -30,6 +30,7 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     doParallel,
+    doRNG,
     glmnet,
     hdi
 Roxygen: list(markdown = TRUE)

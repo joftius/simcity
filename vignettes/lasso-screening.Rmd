@@ -4,7 +4,7 @@ output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 link-citations: TRUE
 vignette: >
-  %\VignetteIndexEntry{lasso-screening}
+  %\VignetteIndexEntry{Lasso screening}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteDepends{ggplot2}
   %\VignetteDepends{purrr}
@@ -16,9 +16,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-library(ggplot2)
-library(dplyr)
-theme_set(theme_minimal())
 ```
 
 ## Lasso variable selection
@@ -30,6 +27,9 @@ The lasso [-@tibshirani1996] can be used to fit a linear model to high-dimension
 In this vignette we show how to use `simcity` to simulate many high-dimensional datasets where the true model is a sparse linear model, use the lasso with `glmnet::cv.glmnet` to fit an estimated model, and then check whether the estimated model has a certain property we call **screening**. This means the selected model's support is a superset of the true support, i.e. if selected variables include all the ones with nonzero coefficients in the true model.
 
 ```{r setup}
+library(ggplot2)
+theme_set(theme_minimal())
+library(dplyr)
 library(simcity)
 ```
 

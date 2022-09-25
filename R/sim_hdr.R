@@ -118,6 +118,7 @@ simulate_hdr <- function(
     postfun = post_glmnet_cvmin,
     postargs = NULL,
     cores = NULL,
+    seed = NULL,
     verbose = FALSE
 )
 {
@@ -126,15 +127,13 @@ simulate_hdr <- function(
   time_start <- Sys.time()
   local_files <- list.files(path = paste0(getwd(), "/R"), pattern = ".R")
   if (is.null(cores)) cores <- floor(detectCores()/2)
-  cl <- makeCluster(cores)
+  cl <- makeCluster(cores, outfile = "")
   registerDoParallel(cl)
-  clusterCall(cl, function() library(glmnet))
-  #clusterCall(cl, function() library(selectiveInference))
-  #clusterCall(cl, function() library(RPtests))
-  #clusterCall(cl, function() library(unbiasedgoodness))
-  #clusterCall(cl, function() source(paste0(getwd(), "/R/sim_hdr.R")))
-
-  output <- foreach(icount(niters)) %dopar% {
+  registerDoRNG(seed)
+  #clusterCall(cl, function() library(glmnet))
+  pb <- txtProgressBar(0, niters, style = 3)
+  output <- foreach(i = icount(niters)) %dorng% {
+    setTxtProgressBar(pb, i)
     instance_hdr(
       n,
       p,
@@ -155,7 +154,7 @@ simulate_hdr <- function(
       postargs
     )
   }
-  stopImplicitCluster()
+  stopCluster(cl)
   time_end <- Sys.time()
 
   if (verbose) print(time_end - time_start)

@@ -13,4 +13,40 @@ test_that("glmnet_cvmin works", {
   expect_equal(beta, output_glmnet_cvmin$true_beta[-1])
 })
 
+test_that("simulate_hdr works", {
+  n <- 50
+  p <- 100
+  s0 <- 5
+  niters <- 4
+  result1 <- simulate_hdr(niters, n, p, s0, cores = 1, seed = 42)
+  expect_length(result1, niters)
+
+  set.seed(1)
+  result2 <- simulate_hdr(niters, n, p, s0, cores = 1, seed = 42)
+  expect_length(result2, niters)
+  expect_true(identical(result1, result2))
+
+  result3 <- simulate_hdr(niters, n, p, s0, cores = 1, seed = 1)
+  expect_length(result3, niters)
+  expect_false(identical(result1, result3))
+})
+
+test_that("simulate_hdr works with doRNG", {
+  n <- 50
+  p <- 100
+  s0 <- 5
+  niters <- 4
+  result1 <- simulate_hdr(niters, n, p, s0, cores = 2, seed = 42)
+  expect_length(result1, niters)
+
+  set.seed(1)
+  result2 <- simulate_hdr(niters, n, p, s0, cores = 2, seed = 42)
+  expect_length(result2, niters)
+  expect_true(identical(result1, result2))
+
+  result3 <- simulate_hdr(niters, n, p, s0, cores = 2, seed = 1)
+  expect_length(result3, niters)
+  expect_false(identical(result1, result3))
+})
+
 

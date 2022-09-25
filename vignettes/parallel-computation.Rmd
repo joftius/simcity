@@ -1,0 +1,59 @@
+---
+title: "Speed-up from parallel computation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Speed-up from parallel computation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ggplot2)
+theme_set(theme_minimal())
+library(dplyr)
+library(simcity)
+```
+
+
+```{r replicate}
+set.seed(1)
+n <- 100
+p <- 200
+s0 <- 10
+niters <- 100
+system.time(
+  many_lassos_unparallel <- 
+    replicate(niters, instance_hdr(n, p, s0))
+)
+```
+
+```{r pbreplicate}
+if (require(pbapply)) {
+  system.time(
+  many_lassos_pbunparallel <- 
+    pbreplicate(niters, instance_hdr(n, p, s0))
+  )
+}
+```
+
+```{r cores2}
+system.time(
+  many_lassos_2cores <- 
+    simulate_hdr(niters, n, p, s0, cores = 2)
+)
+```
+
+```{r cores4}
+system.time(
+  many_lassos_2cores <- 
+    simulate_hdr(niters, n, p, s0, cores = 4)
+)
+```
+
